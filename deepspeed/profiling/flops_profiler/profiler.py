@@ -3,7 +3,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from functools import partial
-from typing import Callable, List, Optional, Tuple
+from typing import List, Optional
 from collections import OrderedDict
 import numpy as np
 
@@ -251,7 +251,6 @@ class FlopsProfiler(object):
             return
         import sys
         import os.path
-        from os import path
         original_stdout = None
         f = None
         if output_file and output_file != "":
@@ -305,15 +304,15 @@ class FlopsProfiler(object):
 
         fwd_latency = self.get_total_duration()
         if self.ds_engine and self.ds_engine.wall_clock_breakdown():
-            fwd_latency = self.ds_engine.timers('forward').elapsed(False)
+            fwd_latency = self.ds_engine.timers('forward').elapsed(False) / 1000.0
         print('{:<60}  {:<8}'.format('fwd latency: ', duration_to_string(fwd_latency)))
         print('{:<60}  {:<8}'.format(
             'fwd FLOPS per GPU = fwd flops per GPU / fwd latency: ',
             flops_to_string(total_flops / fwd_latency)))
 
         if self.ds_engine and self.ds_engine.wall_clock_breakdown():
-            bwd_latency = self.ds_engine.timers('backward').elapsed(False)
-            step_latency = self.ds_engine.timers('step').elapsed(False)
+            bwd_latency = self.ds_engine.timers('backward').elapsed(False) / 1000.0
+            step_latency = self.ds_engine.timers('step').elapsed(False) / 1000.0
             print('{:<60}  {:<8}'.format('bwd latency: ',
                                          duration_to_string(bwd_latency)))
             print('{:<60}  {:<8}'.format(
